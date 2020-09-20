@@ -47,9 +47,15 @@ defmodule Yamel do
   defp serialize({key, value}, indentation),
     do: "#{indentation}#{key}: #{serialize(value, indentation)}"
 
-  defp serialize(bitstring_or_number, _indentation)
-       when is_bitstring(bitstring_or_number) or is_number(bitstring_or_number),
-       do: "#{bitstring_or_number}\n"
+  defp serialize(bitstring, _indentation)
+       when is_bitstring(bitstring),
+       do: "#{bitstring}\n"
+  defp serialize(number, _indentation)
+       when is_number(number),
+       do: "#{number}\n"
+  defp serialize(atom, _indentation)
+       when is_atom(atom),
+       do: "#{atom}\n"
 
   defp serialize(map, indentation)
        when is_map(map),
