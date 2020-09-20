@@ -18,7 +18,8 @@ zoo:
   - vee
 """
 
-%{"foo" => foo_value, "zoo" => [first_elem, sec_elem, third_elem]} = Yamel.decode!(yaml_string)
+Yamel.decode!(yaml_string)
+=> %{"foo" => "bar", "zoo" => ["caa", "boo", "vee"]}
 
 Yamel.encode!(["caa", :boo, :"\"foo\""])
 => "- caa\n- boo\n- \"foo\"\n\n"
@@ -38,7 +39,7 @@ Add `yamel` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:yamel, "~> 1.0.1"}
+    {:yamel, "~> 1.0.2"}
   ]
 end
 ```

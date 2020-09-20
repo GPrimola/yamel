@@ -61,10 +61,10 @@ defmodule Yamel do
        when is_map(map),
        do: Enum.map(map, &serialize(&1, indentation))
 
-  defp serialize(list, indentation)
-       when is_list(list) do
-    Enum.map(list, fn
-      value when is_list(value) or is_map(value) ->
+  defp serialize(list_or_tuple, indentation)
+       when is_list(list_or_tuple) do
+    Enum.map(list_or_tuple, fn
+      value when is_list(value) or is_map(value) or is_tuple(value) ->
         "#{indentation}-\n#{serialize(value, "#{indentation}  ")}"
 
       value ->

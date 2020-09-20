@@ -213,5 +213,35 @@ defmodule YamelTest do
       refute encoded_sequence_in_a_map == sequence_in_map_shortcut_yaml
       assert encoded_sequence_in_a_map == sequence_in_map_yaml
     end
+
+    test "when structure has different value types" do
+      value = ["açaí", :banana, :"whey protein", 300, :g, total: 10.23]
+
+      different_value_types_yaml = ~S"""
+      - açaí
+      - banana
+      - whey protein
+      - 300
+      - g
+      -
+        total: 10.23
+
+      """
+
+      encoded_different_value_types = Yamel.encode!(value)
+      assert encoded_different_value_types == different_value_types_yaml
+    end
+
+    test "when value is other than map or list" do
+      assert_raise ArgumentError, fn ->
+        Yamel.encode!(124)
+      end
+    end
+  end
+
+  describe "encode/1" do
+    test "when value is other than map or list" do
+      assert {:error, "Unsupported value: 123"} = Yamel.encode(123)
+    end
   end
 end
