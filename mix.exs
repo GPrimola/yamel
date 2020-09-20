@@ -8,7 +8,14 @@ defmodule Yamel.MixProject do
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
       package: package(),
-      deps: deps()
+      deps: deps(),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ],
     ]
   end
 
@@ -23,7 +30,8 @@ defmodule Yamel.MixProject do
   defp deps do
     [
       {:yaml_elixir, "~> 2.4.0"},
-      {:ex_doc, ">= 0.0.0", runtime: false, only: :dev}
+      {:ex_doc, ">= 0.0.0", runtime: false, only: :dev},
+      {:excoveralls, "~> 0.10", only: :test}
     ]
   end
 
