@@ -1,6 +1,8 @@
-# YamEl
+# Yamel
 
-**TODO: Add description**
+A yaml parser and serializer to work with Yaml files in Elixir.
+
+It has `encode/1` and `decode/1` functions, matching interfaces with libraries like [Jason](https://github.com/michalmuskala/jason) or [Poison](https://github.com/devinus/poison)
 
 ## Installation
 
@@ -10,7 +12,7 @@ by adding `yamel` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:yamel, "~> 0.1.0"}
+    {:yamel, "~> 1.0.0"}
   ]
 end
 ```
