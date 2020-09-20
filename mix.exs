@@ -4,9 +4,10 @@ defmodule Yamel.MixProject do
   def project do
     [
       app: :yamel,
-      version: "0.1.0",
+      version: "1.0.0",
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
+      package: package(),
       deps: deps()
     ]
   end
@@ -23,6 +24,17 @@ defmodule Yamel.MixProject do
     [
       {:yaml_elixir, "~> 2.4.0"},
       {:ex_doc, ">= 0.0.0", runtime: false, only: :dev}
+    ]
+  end
+
+  defp package do
+    [
+      name: "yamel",
+      description: """
+      This is a helper to work with Yaml files in Elixir.
+      """,
+      licenses: ["Apache-2.0"],
+      links: %{"GitHub" => "https://github.com/GPrimola/yamel"}
     ]
   end
 end
