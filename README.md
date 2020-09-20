@@ -3,7 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/GPrimola/yamel/badge.svg?branch=master)](https://coveralls.io/github/GPrimola/yamel?branch=master)
 [![Docs](https://img.shields.io/badge/api-docs-yellow.svg?style=flat)](https://hexdocs.pm/yamel)
 ![Hex.pm](https://img.shields.io/hexpm/v/yamel)
-![Hex.pm](https://img.shields.io/hexpm/dt/yamel)
+<!-- ![Hex.pm](https://img.shields.io/hexpm/dt/yamel) -->
 
 A yaml parser and serializer to work with Yaml files in Elixir.
 
