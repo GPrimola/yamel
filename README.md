@@ -1,7 +1,7 @@
 # Yamel
 
 [![Coverage Status](https://coveralls.io/repos/github/GPrimola/yamel/badge.svg?branch=master)](https://coveralls.io/github/GPrimola/yamel?branch=master)
-[![Docs](https://img.shields.io/badge/api-docs-yellow.svg?style=flat)](https://hexdocs.pm/yamel)
+[![Docs](https://img.shields.io/badge/api-docs-blueviolet.svg?style=flat)](https://hexdocs.pm/yamel)
 ![Hex.pm](https://img.shields.io/hexpm/v/yamel)
 <!-- ![Hex.pm](https://img.shields.io/hexpm/dt/yamel) -->
 
