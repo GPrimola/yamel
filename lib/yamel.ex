@@ -6,13 +6,25 @@ defmodule Yamel do
   @type t :: map() | list()
   @type yaml :: binary()
 
-  @spec decode!(yaml()) :: Yamel.t()
-  defdelegate decode!(yaml_string), to: YamlElixir, as: :read_from_string!
+  @spec decode!(yaml(), atoms: boolean()) :: Yamel.t()
+  def decode!(yaml_string, options \\ []) do
+    atoms = Keyword.get(options, :atoms)
 
-  @spec decode(yaml()) :: {:ok, Yamel.t()} | {:error, reason :: binary()}
-  defdelegate decode(yaml_string), to: YamlElixir, as: :read_from_string
+    yaml_string
+    |> YamlElixir.read_from_string!()
+    |> maybe_atom(atoms)
+  end
 
-  @spec encode(Yamel.t()) :: yaml()
+  @spec decode(yaml(), atoms: boolean()) :: {:ok, Yamel.t()} | {:error, reason :: binary()}
+  def decode(yaml_string, options \\ []) do
+    atoms = Keyword.get(options, :atoms)
+
+    yaml_string
+    |> YamlElixir.read_from_string()
+    |> maybe_atom(atoms)
+  end
+
+  @spec encode!(Yamel.t()) :: yaml()
   def encode!(map_or_list)
 
   def encode!(map_or_list)
@@ -38,6 +50,30 @@ defmodule Yamel do
     |> Kernel.<>("\n")
   end
 
+  defp maybe_atom({:ok, yaml}, atoms), do: {:ok, maybe_atom(yaml, atoms)}
+
+  defp maybe_atom({:error, _reason} = error, _atoms), do: error
+
+  defp maybe_atom(map, true) when is_map(map) do
+    for {key, value} <- map, into: %{} do
+      cond do
+        is_atom(key) -> {key, maybe_atom(value, true)}
+        true -> {String.to_atom(key), maybe_atom(value, true)}
+      end
+    end
+  end
+
+  defp maybe_atom(list, true) when is_list(list) do
+    for value <- list, into: [] do
+      cond do
+        is_map(value) -> maybe_atom(value, true)
+        true -> value
+      end
+    end
+  end
+
+  defp maybe_atom(yaml, _atoms), do: yaml
+
   defp serialize(value), do: serialize(value, "")
 
   defp serialize({key, value}, indentation)
@@ -50,9 +86,11 @@ defmodule Yamel do
   defp serialize(bitstring, _indentation)
        when is_bitstring(bitstring),
        do: "#{bitstring}\n"
+
   defp serialize(number, _indentation)
        when is_number(number),
        do: "#{number}\n"
+
   defp serialize(atom, _indentation)
        when is_atom(atom),
        do: "#{atom}\n"
