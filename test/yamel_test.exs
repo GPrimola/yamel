@@ -1,6 +1,8 @@
 defmodule YamelTest do
   use ExUnit.Case
 
+  doctest Yamel
+
   @doc """
   This test cases were extracted from https://yaml.org/YAML_for_ruby.html
   """
