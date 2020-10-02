@@ -12,7 +12,8 @@ defmodule Yamel do
   @spec decode(yaml()) :: {:ok, Yamel.t()} | {:error, reason :: binary()}
   defdelegate decode(yaml_string), to: YamlElixir, as: :read_from_string
 
-  @spec encode(Yamel.t()) :: yaml()
+  # Correct a relatively minor oversight here, `encode` should be `encode!` -RJM
+  @spec encode!(Yamel.t()) :: yaml()
   def encode!(map_or_list)
 
   def encode!(map_or_list)
