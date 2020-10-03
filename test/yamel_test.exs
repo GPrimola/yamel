@@ -246,4 +246,37 @@ defmodule YamelTest do
       assert {:error, "Unsupported value: 123"} = Yamel.encode(123)
     end
   end
+
+  describe "decode!/2" do
+    test "when structure is Nested Mappings with atomized keys" do
+      yaml = ~S"""
+      foo: bar
+      zoo:
+        fruit: apple
+        name: steve
+        sport: baseball
+      """
+
+      expected = %{foo: "bar", zoo: %{fruit: "apple", name: "steve", sport: "baseball"}}
+
+      assert Yamel.decode!(yaml, keys: :atoms) == expected
+    end
+  end
+
+  describe "decode/2" do
+    test "when structure is a Map List with atomized keys" do
+      yaml = ~S"""
+      - foo:
+          a: 1
+          b: 2
+      - bar:
+          c: 3
+          d: 4
+      """
+
+      expected = [%{foo: %{a: 1, b: 2}}, %{bar: %{c: 3, d: 4}}]
+
+      assert Yamel.decode(yaml, keys: :atoms) == {:ok, expected}
+    end
+  end
 end
