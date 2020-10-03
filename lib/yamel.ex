@@ -12,7 +12,17 @@ defmodule Yamel do
   @spec decode(yaml()) :: {:ok, Yamel.t()} | {:error, reason :: binary()}
   defdelegate decode(yaml_string), to: YamlElixir, as: :read_from_string
 
-  @spec encode(Yamel.t()) :: yaml()
+  @doc ~S"""
+  Encodes a YAML term directly into a string, throwing an exception if the term
+  can not be encoded.
+
+  ## Examples
+
+      iex> Yamel.encode!(["foo", "bar", "baz"])
+      "- foo\n- bar\n- baz\n\n"
+
+  """
+  @spec encode!(Yamel.t()) :: yaml()
   def encode!(map_or_list)
 
   def encode!(map_or_list)
@@ -22,6 +32,17 @@ defmodule Yamel do
   def encode!(value),
     do: raise(ArgumentError, "Unsupported value: #{inspect(value)}")
 
+  @doc ~S"""
+  Encodes a YAML term. Returns `{:ok, yaml()}` where the second term is the
+  encoded YAML term. Otherwise, returns `{:error, reason}` with `reason`
+  being a string stating the error reason.
+
+  ## Examples
+
+      iex> Yamel.encode(["foo", "bar", "baz"])
+      {:ok, "- foo\n- bar\n- baz\n\n"}
+
+  """
   @spec encode(Yamel.t()) :: {:ok, yaml()} | {:error, reason :: binary()}
   def encode(map_or_list)
 
