@@ -5,23 +5,25 @@ defmodule Yamel do
 
   @type t :: map() | list()
   @type yaml :: binary()
+  @type keys :: :atoms | :strings
+  @type decode_opt :: {:keys, keys}
 
-  @spec decode!(yaml(), atoms: boolean()) :: Yamel.t()
+  @spec decode!(yaml(), [decode_opt]) :: Yamel.t()
   def decode!(yaml_string, options \\ []) do
-    atoms = Keyword.get(options, :atoms)
+    keys = Keyword.get(options, :keys, :strings)
 
     yaml_string
     |> YamlElixir.read_from_string!()
-    |> maybe_atom(atoms)
+    |> maybe_atom(keys)
   end
 
-  @spec decode(yaml(), atoms: boolean()) :: {:ok, Yamel.t()} | {:error, reason :: binary()}
+  @spec decode(yaml(), [decode_opt]) :: {:ok, Yamel.t()} | {:error, reason :: binary()}
   def decode(yaml_string, options \\ []) do
-    atoms = Keyword.get(options, :atoms)
+    keys = Keyword.get(options, :keys, :strings)
 
     yaml_string
     |> YamlElixir.read_from_string()
-    |> maybe_atom(atoms)
+    |> maybe_atom(keys)
   end
 
   @doc ~S"""
@@ -71,29 +73,29 @@ defmodule Yamel do
     |> Kernel.<>("\n")
   end
 
-  defp maybe_atom({:ok, yaml}, atoms), do: {:ok, maybe_atom(yaml, atoms)}
+  defp maybe_atom({:ok, yaml}, keys), do: {:ok, maybe_atom(yaml, keys)}
 
-  defp maybe_atom({:error, _reason} = error, _atoms), do: error
+  defp maybe_atom({:error, _reason} = error, _keys), do: error
 
-  defp maybe_atom(map, true) when is_map(map) do
+  defp maybe_atom(map, :atoms) when is_map(map) do
     for {key, value} <- map, into: %{} do
       cond do
-        is_atom(key) -> {key, maybe_atom(value, true)}
-        true -> {String.to_atom(key), maybe_atom(value, true)}
+        is_atom(key) -> {key, maybe_atom(value, :atoms)}
+        true -> {String.to_atom(key), maybe_atom(value, :atoms)}
       end
     end
   end
 
-  defp maybe_atom(list, true) when is_list(list) do
+  defp maybe_atom(list, :atoms) when is_list(list) do
     for value <- list, into: [] do
       cond do
-        is_map(value) -> maybe_atom(value, true)
+        is_map(value) -> maybe_atom(value, :atoms)
         true -> value
       end
     end
   end
 
-  defp maybe_atom(yaml, _atoms), do: yaml
+  defp maybe_atom(yaml, _keys), do: yaml
 
   defp serialize(value), do: serialize(value, "")
 

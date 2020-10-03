@@ -259,7 +259,7 @@ defmodule YamelTest do
 
       expected = %{foo: "bar", zoo: %{fruit: "apple", name: "steve", sport: "baseball"}}
 
-      assert Yamel.decode!(yaml, atoms: true) == expected
+      assert Yamel.decode!(yaml, keys: :atoms) == expected
     end
   end
 
@@ -276,7 +276,7 @@ defmodule YamelTest do
 
       expected = [%{foo: %{a: 1, b: 2}}, %{bar: %{c: 3, d: 4}}]
 
-      assert Yamel.decode(yaml, atoms: true) == {:ok, expected}
+      assert Yamel.decode(yaml, keys: :atoms) == {:ok, expected}
     end
   end
 end
