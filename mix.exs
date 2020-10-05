@@ -15,7 +15,7 @@ defmodule Yamel.MixProject do
         "coveralls.detail": :test,
         "coveralls.post": :test,
         "coveralls.html": :test
-      ],
+      ]
     ]
   end
 
