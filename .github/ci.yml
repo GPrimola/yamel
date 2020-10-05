@@ -1,0 +1,85 @@
+name: Yamel CI
+
+on: [ push ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Elixir
+      uses: actions/setup-elixir@v1
+      with:
+        elixir-version: '1.8.x'
+        otp-version: '22.3'
+    - name: Cache Dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          deps
+          _build/test/lib
+        key: ${{ runner.os }}-mix-test-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+        restore-keys: |
+          ${{ runner.os }}-mix-test-
+
+    - name: Install Dependencies
+      run: mix deps.get
+
+    - name: Build Dependencies
+      env:
+        MIX_ENV: test
+      run: mix deps.compile
+
+    - name: Build Yamel
+      env:
+        MIX_ENV: test
+      run: mix compile
+
+  lint:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Elixir
+      uses: actions/setup-elixir@v1
+      with:
+        elixir-version: '1.8.x'
+        otp-version: '22.3'
+    - name: Cache Dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          deps
+          _build/test/lib
+        key: ${{ runner.os }}-mix-test-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+        restore-keys: |
+          ${{ runner.os }}-mix-test-
+
+    - env:
+        MIX_ENV: test
+      run: mix format --check-formatted
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Elixir
+      uses: actions/setup-elixir@v1
+      with:
+        elixir-version: '1.8.x'
+        otp-version: '22.3'
+    - name: Cache Dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          deps
+          _build/test/lib
+        key: ${{ runner.os }}-mix-test-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+        restore-keys: |
+          ${{ runner.os }}-mix-test-
+
+    - run: mix test
