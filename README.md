@@ -22,6 +22,19 @@ An [yaml](https://en.wikipedia.org/wiki/YAML) parser and serializer to work with
 #### We appreciate your collaboration! Thank you very much!! 🙏🏿🙏🏾🙏🏽🙏🏼🙏🏻🙏✨
 
 
+## Installation
+
+Add `yamel` to your list of dependencies in `mix.exs`:
+
+```elixir
+def deps do
+  [
+    {:yamel, "~> 1.0.3"}
+  ]
+end
+```
+
+
 ## Usage
 
 ```elixir
@@ -45,16 +58,4 @@ Yamel.encode!(["caa", :boo, :"\"foo\""])
 => :ok
 
 %{foo: value} = Yamel.IO.read!("/from/file.yaml")
-```
-
-## Installation
-
-Add `yamel` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:yamel, "~> 1.0.2"}
-  ]
-end
 ```
