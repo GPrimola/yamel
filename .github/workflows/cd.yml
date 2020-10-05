@@ -40,8 +40,6 @@ jobs:
       run: mix compile
 
     - name: Build Docs
-      env:
-        MIX_ENV: prod
       run: mix docs
 
   check_package:
