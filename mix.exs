@@ -1,14 +1,19 @@
 defmodule Yamel.MixProject do
   use Mix.Project
 
+  @version "1.0.2"
+  @source_url "https://github.com/GPrimola/yamel"
+
   def project do
     [
       app: :yamel,
-      version: "1.0.2",
+      version: @version,
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
       package: package(),
       deps: deps(),
+      docs: docs(),
+      source_url: @source_url,
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
         coveralls: :test,
@@ -35,6 +40,15 @@ defmodule Yamel.MixProject do
     ]
   end
 
+  defp docs do
+    [
+      main: "readme",
+      source_ref: "v#{@version}",
+      source_url: @source_url,
+      logo: "priv/img/yamel-logo.png"
+    ]
+  end
+
   defp package do
     [
       name: "yamel",
@@ -42,7 +56,7 @@ defmodule Yamel.MixProject do
       This is a helper to work with Yaml files in Elixir.
       """,
       licenses: ["Apache-2.0"],
-      links: %{"GitHub" => "https://github.com/GPrimola/yamel"}
+      links: %{"GitHub" => @source_url}
     ]
   end
 end
