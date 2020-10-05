@@ -1,7 +1,7 @@
 defmodule Yamel.MixProject do
   use Mix.Project
 
-  @version "1.0.3"
+  @version "1.0.4"
   @source_url "https://github.com/GPrimola/yamel"
 
   def project do
@@ -42,7 +42,6 @@ defmodule Yamel.MixProject do
 
   defp docs do
     [
-      main: "readme",
       source_ref: "v#{@version}",
       source_url: @source_url,
       logo: "priv/img/yamel-logo.png"

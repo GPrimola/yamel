@@ -1,4 +1,8 @@
 defmodule Yamel.IO do
+  @moduledoc """
+  Module to work with YAML files in Elixir.
+  """
+
   @spec read!(file_path :: binary()) :: map() | list()
   def read!(file_path),
     do: YamlElixir.read_from_file!(file_path)

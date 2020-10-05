@@ -1,6 +1,6 @@
 defmodule Yamel do
   @moduledoc """
-  Documentation for `Yamel`.
+  Module to work with YAML strings in Elixir.
   """
 
   @type t :: map() | list()
