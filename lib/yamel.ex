@@ -8,6 +8,21 @@ defmodule Yamel do
   @type keys :: :atoms | :strings
   @type decode_opt :: {:keys, keys}
 
+  @doc ~S"""
+  Decode a YAML string into it respective data type in elixir, throwing an exception if the
+  string can not be encoded
+
+  ## Examples
+
+     iex> Yamel.decode!("
+     ...>     name: Jane Doe
+     ...>     job: Developer
+     ...>     skill: Elite
+     ...>     employed: True")
+
+
+
+  """
   @spec decode!(yaml(), [decode_opt]) :: Yamel.t()
   def decode!(yaml_string, options \\ []) do
     keys = Keyword.get(options, :keys, :strings)
@@ -16,6 +31,22 @@ defmodule Yamel do
     |> YamlElixir.read_from_string!()
     |> maybe_atom(keys)
   end
+
+  @doc ~S"""
+  Decode a YAML string into it respective data type in elixir, returning `{:ok, Yamel.t()}`
+  where the second term is the Yamel in Elixir representation. Otherwise, returns `{:error, reason}`
+  where `reason` is a `YamlElixir` error module with a message inside
+
+  ## Examples
+
+      iex> Yamel.decode(
+      ...> ~s"---
+      ...>    - Apple
+      ...>    - Orange
+      ...>    - Strawberry
+      ...>    - Mango")
+      {:ok, ["Apple", "Orange","Strawberry", "Mango"]}
+  """
 
   @spec decode(yaml(), [decode_opt]) :: {:ok, Yamel.t()} | {:error, reason :: binary()}
   def decode(yaml_string, options \\ []) do
