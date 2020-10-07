@@ -14,12 +14,13 @@ defmodule Yamel do
 
   ## Examples
 
-      iex> Yamel.decode!("
-      ...>name: Jane Doe
-      ...>job: Developer
-      ...>skill: Elite
-      ...>employed: True")
-      %{"employed" => true, "job" => "Developer", "name" => "Jane Doe", "skill" => "Elite"}
+     iex> Yamel.decode!("
+     ...>     name: Jane Doe
+     ...>     job: Developer
+     ...>     skill: Elite
+     ...>     employed: True")
+
+
 
   """
   @spec decode!(yaml(), [decode_opt]) :: Yamel.t()
@@ -38,13 +39,12 @@ defmodule Yamel do
 
   ## Examples
 
-      iex> Yamel.decode("
-      ...>---
-      ...>- Apple
-      ...>- Orange
-      ...>- Strawberry
-      ...>- Mango
-      ...> ")
+      iex> Yamel.decode(
+      ...> ~s"---
+      ...>    - Apple
+      ...>    - Orange
+      ...>    - Strawberry
+      ...>    - Mango")
       {:ok, ["Apple", "Orange","Strawberry", "Mango"]}
   """
 
