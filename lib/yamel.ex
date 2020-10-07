@@ -19,9 +19,7 @@ defmodule Yamel do
      ...>     job: Developer
      ...>     skill: Elite
      ...>     employed: True")
-
-
-
+     %{"employed" => true, "job" => "Developer", "name" => "Jane Doe", "skill" => "Elite"}
   """
   @spec decode!(yaml(), [decode_opt]) :: Yamel.t()
   def decode!(yaml_string, options \\ []) do
