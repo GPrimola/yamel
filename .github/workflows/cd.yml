@@ -123,10 +123,5 @@ jobs:
           git config user.name Lucasbot
           git config user.email lucas.primola@gmail.com
           git commit -am "New version $(cat version)."
-      - name: Merge releases/$(cat version) -> master
-        uses: devmasx/merge-branch@v1.3.0
-        with:
-          type: now
-          from_branch: releases/$(cat version)
-          target_branch: master
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          git checkout master
+          git merge releases/$(cat version)
