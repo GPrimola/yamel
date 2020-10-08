@@ -22,9 +22,13 @@ jobs:
           _build/prod/lib
           deps
           doc
+          mix.exs
         key: ${{ runner.os }}-mix-prod-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
         restore-keys: |
           ${{ runner.os }}-mix-prod-
+
+    - name: Update Version
+      run: elixir ./scripts/update_version.exs
 
     - name: Install Dependencies
       run: mix deps.get
@@ -60,6 +64,7 @@ jobs:
           _build/prod/lib
           deps
           doc
+          mix.exs
         key: ${{ runner.os }}-mix-prod-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
         restore-keys: |
           ${{ runner.os }}-mix-prod-
@@ -86,6 +91,7 @@ jobs:
           _build/prod/lib
           deps
           doc
+          mix.exs
         key: ${{ runner.os }}-mix-prod-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
         restore-keys: |
           ${{ runner.os }}-mix-prod-
@@ -111,13 +117,13 @@ jobs:
       - name: Update README.md and mix.exs
         run: |
           elixir ./scripts/update_version.exs
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git commit -m "New version ${{ readFile('version') }}."
-      - name: Merge releases/${{ readFile('version') }} -> master
+          git config user.name Lucasbot
+          git config user.email lucas.primola@gmail.com
+          git commit -m "New version $(cat version)."
+      - name: Merge releases/$(cat version) -> master
         uses: devmasx/merge-branch@v1.3.0
         with:
           type: now
-          from_branch: releases/${{ readFile('version') }}
+          from_branch: releases/$(cat version)
           target_branch: master
           github_token: ${{ secrets.GITHUB_TOKEN }}
