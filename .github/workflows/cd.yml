@@ -3,7 +3,6 @@ name: Yamel CD
 on:
   workflow_run:
     workflows: ["Yamel Master CI"]
-    branches: [releases/**]
     types:
       - completed
 
