@@ -133,7 +133,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Trigger CD
         run: |
-          if git rev-parse --verify; then
+          if git rev-parse --verify releases/$(cat version); then
             echo "Version already exists."
           else
             git config user.name Lucasbot
