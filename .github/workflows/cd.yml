@@ -1,8 +1,12 @@
 name: Yamel CD
 
 on:
-  push:
-    branches: [ releases/** ]
+  workflow_run:
+    workflows: ["Yamel Master CI"]
+    branches: [releases/**]
+    types:
+      - completed
+
 
 jobs:
   build:

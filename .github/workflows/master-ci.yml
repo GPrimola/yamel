@@ -1,4 +1,4 @@
-name: Yamel CI
+name: Yamel Master CI
 
 on:
   push:
