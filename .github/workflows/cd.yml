@@ -123,5 +123,4 @@ jobs:
           git config user.name Lucasbot
           git config user.email lucas.primola@gmail.com
           git commit -am "New version $(cat version)."
-          git checkout master
-          git merge releases/$(cat version)
+          git push origin master
