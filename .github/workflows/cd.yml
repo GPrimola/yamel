@@ -122,7 +122,7 @@ jobs:
           elixir ./scripts/update_version.exs
           git config user.name Lucasbot
           git config user.email lucas.primola@gmail.com
-          git commit -m "New version $(cat version)."
+          git commit -am "New version $(cat version)."
       - name: Merge releases/$(cat version) -> master
         uses: devmasx/merge-branch@v1.3.0
         with:
