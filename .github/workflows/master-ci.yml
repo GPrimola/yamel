@@ -1,8 +1,7 @@
-name: Yamel CD
+name: Yamel CI
 
 on:
-  push:
-    branches: [ releases/** ]
+  push: [ master ]
 
 jobs:
   build:
@@ -19,30 +18,26 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          _build/prod/lib
           deps
-          doc
-        key: ${{ runner.os }}-mix-prod-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+          _build/test/lib
+        key: ${{ runner.os }}-mix-test-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
         restore-keys: |
-          ${{ runner.os }}-mix-prod-
+          ${{ runner.os }}-mix-test-
 
     - name: Install Dependencies
       run: mix deps.get
 
     - name: Build Dependencies
       env:
-        MIX_ENV: prod
+        MIX_ENV: test
       run: mix deps.compile
 
     - name: Build Yamel
       env:
-        MIX_ENV: prod
+        MIX_ENV: test
       run: mix compile
 
-    - name: Build Docs
-      run: mix docs
-
-  check_package:
+  lint:
     runs-on: ubuntu-latest
     needs: build
 
@@ -57,20 +52,19 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          _build/prod/lib
           deps
-          doc
-        key: ${{ runner.os }}-mix-prod-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+          _build/test/lib
+        key: ${{ runner.os }}-mix-test-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
         restore-keys: |
-          ${{ runner.os }}-mix-prod-
+          ${{ runner.os }}-mix-test-
 
     - env:
-        HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
-      run: mix hex.publish --dry-run
+        MIX_ENV: test
+      run: mix format --check-formatted
 
-  publish_package:
+  test:
     runs-on: ubuntu-latest
-    needs: check_package
+    needs: build
 
     steps:
     - uses: actions/checkout@v2
@@ -83,41 +77,61 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          _build/prod/lib
           deps
-          doc
-        key: ${{ runner.os }}-mix-prod-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+          _build/test/lib
+        key: ${{ runner.os }}-mix-test-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
         restore-keys: |
-          ${{ runner.os }}-mix-prod-
+          ${{ runner.os }}-mix-test-
 
-    - env:
-        HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
-      run: mix hex.publish --yes
+    - run: mix test
 
-
-  update_version:
+  coverage:
     runs-on: ubuntu-latest
-    needs: publish_package
+    needs: test
+
+    env:
+      MIX_ENV: test
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Elixir
+        uses: actions/setup-elixir@v1
+        with:
+          elixir-version: '1.9.x'
+          otp-version: '22.3'
+
+      - name: Cache Dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            deps
+            _build/test/lib
+          key: ${{ runner.os }}-mix-test-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+          restore-keys: |
+            ${{ runner.os }}-mix-test-
+
+      - name: Build ExCoveralls
+        run: mix compile excoveralls
+
+      - name: Coverage Summary
+        run: mix coveralls
+
+      - name: Publish Coverage
+        run: mix coveralls.github
+
+
+  trigger_cd:
+    runs-on: ubuntu-latest
+    needs: coverage
 
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Elixir
-        uses: actions/setup-elixir@v1
-        with:
-          elixir-version: '1.8.x'
-          otp-version: '22.3'
-      - name: Update README.md and mix.exs
+      - name: Trigger CD
         run: |
-          elixir ./scripts/update_version.exs
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git commit -m "New version ${{ readFile('version') }}."
-      - name: Merge releases/${{ readFile('version') }} -> master
-        uses: devmasx/merge-branch@v1.3.0
-        with:
-          type: now
-          from_branch: releases/${{ readFile('version') }}
-          target_branch: master
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          git checkout -b releases/${{ readFile('version') }}
+          git push
