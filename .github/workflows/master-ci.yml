@@ -128,7 +128,7 @@ jobs:
     needs: coverage
 
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_ACTIONS_USER }}
     steps:
       - uses: actions/checkout@v2
       - name: Trigger CD
