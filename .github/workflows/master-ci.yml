@@ -136,4 +136,4 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git checkout -b releases/$(cat version)
-          git push
+          git push origin releases/$(cat version)
