@@ -1,7 +1,7 @@
 defmodule Yamel.MixProject do
   use Mix.Project
 
-  @version "1.0.5"
+  @version "1.0.6"
   @source_url "https://github.com/GPrimola/yamel"
   @logo_path "priv/img/yamel-logo.png"
   @licenses ["Apache-2.0"]
