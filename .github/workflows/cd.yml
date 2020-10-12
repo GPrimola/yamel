@@ -122,5 +122,10 @@ jobs:
           elixir ./scripts/update_version.exs
           git config user.name Lucasbot
           git config user.email lucas.primola@gmail.com
-          git commit -am "Updated README.md and mix.exs to version $(cat version)."
-          git push origin master
+          if [[ -n $(git diff --stat) ]]
+          then
+            git commit -am "Updated README.md and mix.exs to version $(cat version)."
+            git push origin master
+          else
+            echo "Already updated with version."
+          fi
