@@ -321,6 +321,24 @@ defmodule YamelTest do
       assert encoded_different_value_types == different_value_types_yaml
     end
 
+    test "when structure has different value types with 'quoted' option" do
+      value = ["açaí", :banana, :"whey protein", 300, :g, total: 10.23]
+
+      different_value_types_yaml = ~S"""
+      - "açaí"
+      - "banana"
+      - "whey protein"
+      - "300"
+      - "g"
+      -
+        total: "10.23"
+
+      """
+
+      encoded_different_value_types = Yamel.encode!(value, [:quoted])
+      assert encoded_different_value_types == different_value_types_yaml
+    end
+
     test "when value is other than map or list" do
       assert_raise ArgumentError, fn ->
         Yamel.encode!(124)
