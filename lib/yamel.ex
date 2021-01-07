@@ -66,13 +66,13 @@ defmodule Yamel do
 
   """
   @spec encode!(Yamel.t()) :: yaml()
-  def encode!(map_or_list)
+  def encode!(map_or_list, opts \\ [])
 
-  def encode!(map_or_list)
+  def encode!(map_or_list, opts)
       when is_map(map_or_list) or is_list(map_or_list),
-      do: to_yaml!(map_or_list)
+      do: to_yaml!(map_or_list, opts)
 
-  def encode!(value),
+  def encode!(value, _opts),
     do: raise(ArgumentError, "Unsupported value: #{inspect(value)}")
 
   @doc ~S"""
@@ -119,17 +119,18 @@ defmodule Yamel do
   defp maybe_atom(yaml, _keys), do: yaml
 
   @spec to_yaml!(Yamel.t(), opts :: keyword()) :: yaml()
-  defp to_yaml!(map_or_list, opts \\ [])
+  defp to_yaml!(map_or_list, opts)
+
   defp to_yaml!(map_or_list, opts) do
-    opts_map = 
-    opts
-    |> Enum.map(fn 
-      opt when is_tuple(opt) -> opt
-      opt -> {opt, true}
-    end)
-    |> Map.new()
-    |> Map.update(:indentation, "", &(&1))
-    
+    opts_map =
+      opts
+      |> Enum.map(fn
+        opt when is_tuple(opt) -> opt
+        opt -> {opt, true}
+      end)
+      |> Map.new()
+      |> Map.update(:indentation, "", & &1)
+
     map_or_list
     |> serialize(opts_map)
     |> Enum.join()
@@ -138,7 +139,10 @@ defmodule Yamel do
 
   defp serialize({key, value}, %{indentation: indentation} = opts)
        when is_map(value) or is_list(value),
-       do: "#{indentation}#{key}:\n#{serialize(value, Map.put(opts, :indentation, "#{indentation}  "))}"
+       do:
+         "#{indentation}#{key}:\n#{
+           serialize(value, Map.put(opts, :indentation, "#{indentation}  "))
+         }"
 
   defp serialize({key, value}, %{indentation: indentation} = opts),
     do: "#{indentation}#{key}: #{serialize(value, opts)}"
@@ -146,6 +150,7 @@ defmodule Yamel do
   defp serialize(bitstring, %{quoted: true} = _opts)
        when is_bitstring(bitstring),
        do: "\"#{bitstring}\"\n"
+
   defp serialize(bitstring, _opts)
        when is_bitstring(bitstring),
        do: "#{bitstring}\n"
@@ -153,6 +158,7 @@ defmodule Yamel do
   defp serialize(number, %{quoted: true} = _opts)
        when is_number(number),
        do: "\"#{number}\"\n"
+
   defp serialize(number, _opts)
        when is_number(number),
        do: "#{number}\n"
@@ -160,6 +166,7 @@ defmodule Yamel do
   defp serialize(atom, %{quoted: true} = _opts)
        when is_atom(atom),
        do: "\"#{atom}\"\n"
+
   defp serialize(atom, _opts)
        when is_atom(atom),
        do: "#{atom}\n"

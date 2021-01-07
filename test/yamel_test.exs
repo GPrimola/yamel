@@ -82,6 +82,19 @@ defmodule YamelTest do
       assert encoded_simple_map == simple_map_yaml
     end
 
+    test "when value is Simple Mapping with 'quoted' options" do
+      simple_map = %{foo: "bar", zoo: "caa"}
+
+      simple_map_yaml = ~S"""
+      foo: "bar"
+      zoo: "caa"
+
+      """
+
+      encoded_simple_map = Yamel.encode!(simple_map, [:quoted])
+      assert encoded_simple_map == simple_map_yaml
+    end
+
     test "when value is Sequence in a Mapping" do
       sequence_in_a_map = %{foo: "bar", zoo: ["uno", "dos"]}
 
@@ -110,6 +123,22 @@ defmodule YamelTest do
       """
 
       encoded_nested_map = Yamel.encode!(nested_map)
+      assert encoded_nested_map == nested_map_yaml
+    end
+
+    test "when value is Nested Mappings with 'quoted' option" do
+      nested_map = %{foo: "bar", zoo: %{fruit: "apple", name: "steve", sport: "baseball"}}
+
+      nested_map_yaml = ~S"""
+      foo: "bar"
+      zoo:
+        fruit: "apple"
+        name: "steve"
+        sport: "baseball"
+
+      """
+
+      encoded_nested_map = Yamel.encode!(nested_map, [:quoted])
       assert encoded_nested_map == nested_map_yaml
     end
 
@@ -142,6 +171,35 @@ defmodule YamelTest do
       assert encoded_mixed_map == mixed_map_yaml
     end
 
+    test "when value is Mixed Mapping with 'quoted' option" do
+      mixed_map = %{
+        foo: "bar",
+        zoo: [
+          %{fruit: "apple", name: "steve", sport: "baseball"},
+          "more",
+          %{python: "rocks", javascript: "papers", ruby: "scissorses"}
+        ]
+      }
+
+      mixed_map_yaml = ~S"""
+      foo: "bar"
+      zoo:
+        -
+          fruit: "apple"
+          name: "steve"
+          sport: "baseball"
+        - "more"
+        -
+          javascript: "papers"
+          python: "rocks"
+          ruby: "scissorses"
+
+      """
+
+      encoded_mixed_map = Yamel.encode!(mixed_map, [:quoted])
+      assert encoded_mixed_map == mixed_map_yaml
+    end
+
     test "when value is Mapping-in-Sequence" do
       map_in_sequence = [%{"work on yamel.ex" => ["work on Store"]}]
 
@@ -153,6 +211,20 @@ defmodule YamelTest do
       """
 
       encoded_map_in_sequence = Yamel.encode!(map_in_sequence)
+      assert encoded_map_in_sequence == map_in_sequence_yaml
+    end
+
+    test "when value is Mapping-in-Sequence with 'quoted' option" do
+      map_in_sequence = [%{"work on yamel.ex" => ["work on Store"]}]
+
+      map_in_sequence_yaml = ~S"""
+      -
+        work on yamel.ex:
+          - "work on Store"
+
+      """
+
+      encoded_map_in_sequence = Yamel.encode!(map_in_sequence, [:quoted])
       assert encoded_map_in_sequence == map_in_sequence_yaml
     end
 
@@ -168,6 +240,21 @@ defmodule YamelTest do
       """
 
       encoded_sequence_in_a_map = Yamel.encode!(sequence_in_map)
+      assert encoded_sequence_in_a_map == sequence_in_map_yaml
+    end
+
+    test "when value is Sequence-in-Mapping with 'quoted' option" do
+      sequence_in_map = %{allow: ["localhost", "%.sourceforge.net", "%.freepan.org"]}
+
+      sequence_in_map_yaml = ~S"""
+      allow:
+        - "localhost"
+        - "%.sourceforge.net"
+        - "%.freepan.org"
+
+      """
+
+      encoded_sequence_in_a_map = Yamel.encode!(sequence_in_map, [:quoted])
       assert encoded_sequence_in_a_map == sequence_in_map_yaml
     end
 
