@@ -86,21 +86,13 @@ defmodule Yamel do
       {:ok, "- foo\n- bar\n- baz\n\n"}
 
   """
-  @spec encode(Yamel.t()) :: {:ok, yaml()} | {:error, reason :: binary()}
-  def encode(map_or_list)
+  @spec encode(Yamel.t(), opts :: keyword()) :: {:ok, yaml()} | {:error, reason :: binary()}
+  def encode(map_or_list, opts \\ [])
 
-  def encode(map_or_list) when is_map(map_or_list) or is_list(map_or_list),
-    do: {:ok, to_yaml!(map_or_list)}
+  def encode(map_or_list, opts) when is_map(map_or_list) or is_list(map_or_list),
+    do: {:ok, to_yaml!(map_or_list, opts)}
 
-  def encode(value), do: {:error, "Unsupported value: #{inspect(value)}"}
-
-  @spec to_yaml!(Yamel.t()) :: yaml()
-  defp to_yaml!(map_or_list) do
-    map_or_list
-    |> serialize()
-    |> Enum.join()
-    |> Kernel.<>("\n")
-  end
+  def encode(value, _opts), do: {:error, "Unsupported value: #{inspect(value)}"}
 
   defp maybe_atom({:ok, yaml}, keys), do: {:ok, maybe_atom(yaml, keys)}
 
@@ -126,39 +118,64 @@ defmodule Yamel do
 
   defp maybe_atom(yaml, _keys), do: yaml
 
-  defp serialize(value), do: serialize(value, "")
+  @spec to_yaml!(Yamel.t(), opts :: keyword()) :: yaml()
+  defp to_yaml!(map_or_list, opts \\ [])
+  defp to_yaml!(map_or_list, opts) do
+    opts_map = 
+    opts
+    |> Enum.map(fn 
+      opt when is_tuple(opt) -> opt
+      opt -> {opt, true}
+    end)
+    |> Map.new()
+    |> Map.update(:indentation, "", &(&1))
+    
+    map_or_list
+    |> serialize(opts_map)
+    |> Enum.join()
+    |> Kernel.<>("\n")
+  end
 
-  defp serialize({key, value}, indentation)
+  defp serialize({key, value}, %{indentation: indentation} = opts)
        when is_map(value) or is_list(value),
-       do: "#{indentation}#{key}:\n#{serialize(value, "#{indentation}  ")}"
+       do: "#{indentation}#{key}:\n#{serialize(value, Map.put(opts, :indentation, "#{indentation}  "))}"
 
-  defp serialize({key, value}, indentation),
-    do: "#{indentation}#{key}: #{serialize(value, indentation)}"
+  defp serialize({key, value}, %{indentation: indentation} = opts),
+    do: "#{indentation}#{key}: #{serialize(value, opts)}"
 
-  defp serialize(bitstring, _indentation)
+  defp serialize(bitstring, %{quoted: true} = _opts)
+       when is_bitstring(bitstring),
+       do: "\"#{bitstring}\"\n"
+  defp serialize(bitstring, _opts)
        when is_bitstring(bitstring),
        do: "#{bitstring}\n"
 
-  defp serialize(number, _indentation)
+  defp serialize(number, %{quoted: true} = _opts)
+       when is_number(number),
+       do: "\"#{number}\"\n"
+  defp serialize(number, _opts)
        when is_number(number),
        do: "#{number}\n"
 
-  defp serialize(atom, _indentation)
+  defp serialize(atom, %{quoted: true} = _opts)
+       when is_atom(atom),
+       do: "\"#{atom}\"\n"
+  defp serialize(atom, _opts)
        when is_atom(atom),
        do: "#{atom}\n"
 
-  defp serialize(map, indentation)
+  defp serialize(map, opts)
        when is_map(map),
-       do: Enum.map(map, &serialize(&1, indentation))
+       do: Enum.map(map, &serialize(&1, opts))
 
-  defp serialize(list_or_tuple, indentation)
+  defp serialize(list_or_tuple, %{indentation: indentation} = opts)
        when is_list(list_or_tuple) do
     Enum.map(list_or_tuple, fn
       value when is_list(value) or is_map(value) or is_tuple(value) ->
-        "#{indentation}-\n#{serialize(value, "#{indentation}  ")}"
+        "#{indentation}-\n#{serialize(value, Map.put(opts, :indentation, "#{indentation}  "))}"
 
       value ->
-        "#{indentation}- #{serialize(value)}"
+        "#{indentation}- #{serialize(value, opts)}"
     end)
   end
 end
