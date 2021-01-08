@@ -130,6 +130,7 @@ defmodule Yamel do
       end)
       |> Map.new()
       |> Map.update(:indentation, "", & &1)
+      |> Map.update(:quote, [], & &1)
 
     map_or_list
     |> serialize(opts_map)
@@ -147,29 +148,29 @@ defmodule Yamel do
   defp serialize({key, value}, %{indentation: indentation} = opts),
     do: "#{indentation}#{key}: #{serialize(value, opts)}"
 
-  defp serialize(bitstring, %{quoted: true} = _opts)
-       when is_bitstring(bitstring),
-       do: "\"#{bitstring}\"\n"
+  defp serialize(bitstring, %{quote: quoted} = _opts) when is_bitstring(bitstring) do
+    if Enum.member?(quoted, :string), 
+      do: "\"#{bitstring}\"\n",
+      else: "#{bitstring}\n"
+  end
 
-  defp serialize(bitstring, _opts)
-       when is_bitstring(bitstring),
-       do: "#{bitstring}\n"
+  defp serialize(number, %{quote: quoted} = _opts) when is_number(number) do
+    if Enum.member?(quoted, :number), 
+      do: "\"#{number}\"\n",
+      else: "#{number}\n"
+  end
 
-  defp serialize(number, %{quoted: true} = _opts)
-       when is_number(number),
-       do: "\"#{number}\"\n"
-
-  defp serialize(number, _opts)
-       when is_number(number),
-       do: "#{number}\n"
-
-  defp serialize(atom, %{quoted: true} = _opts)
-       when is_atom(atom),
-       do: "\"#{atom}\"\n"
-
-  defp serialize(atom, _opts)
-       when is_atom(atom),
-       do: "#{atom}\n"
+  defp serialize(boolean, %{quote: quoted} = _opts) when is_boolean(boolean) do
+    if Enum.member?(quoted, :boolean), 
+      do: "\"#{boolean}\"\n",
+      else: "#{boolean}\n"
+  end
+  
+  defp serialize(atom, %{quote: quoted} = _opts) when is_atom(atom) do
+    if Enum.member?(quoted, :atom), 
+      do: "\"#{atom}\"\n",
+      else: "#{atom}\n"
+  end
 
   defp serialize(map, opts)
        when is_map(map),

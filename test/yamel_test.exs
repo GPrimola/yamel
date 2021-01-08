@@ -82,7 +82,7 @@ defmodule YamelTest do
       assert encoded_simple_map == simple_map_yaml
     end
 
-    test "when value is Simple Mapping with 'quoted' options" do
+    test "when value is Simple Mapping with 'quote' options" do
       simple_map = %{foo: "bar", zoo: "caa"}
 
       simple_map_yaml = ~S"""
@@ -91,7 +91,7 @@ defmodule YamelTest do
 
       """
 
-      encoded_simple_map = Yamel.encode!(simple_map, [:quoted])
+      encoded_simple_map = Yamel.encode!(simple_map, [quote: [:string]])
       assert encoded_simple_map == simple_map_yaml
     end
 
@@ -126,7 +126,7 @@ defmodule YamelTest do
       assert encoded_nested_map == nested_map_yaml
     end
 
-    test "when value is Nested Mappings with 'quoted' option" do
+    test "when value is Nested Mappings with 'quote' option" do
       nested_map = %{foo: "bar", zoo: %{fruit: "apple", name: "steve", sport: "baseball"}}
 
       nested_map_yaml = ~S"""
@@ -138,7 +138,7 @@ defmodule YamelTest do
 
       """
 
-      encoded_nested_map = Yamel.encode!(nested_map, [:quoted])
+      encoded_nested_map = Yamel.encode!(nested_map, [quote: [:string]])
       assert encoded_nested_map == nested_map_yaml
     end
 
@@ -171,7 +171,7 @@ defmodule YamelTest do
       assert encoded_mixed_map == mixed_map_yaml
     end
 
-    test "when value is Mixed Mapping with 'quoted' option" do
+    test "when value is Mixed Mapping with 'quote' option" do
       mixed_map = %{
         foo: "bar",
         zoo: [
@@ -196,7 +196,7 @@ defmodule YamelTest do
 
       """
 
-      encoded_mixed_map = Yamel.encode!(mixed_map, [:quoted])
+      encoded_mixed_map = Yamel.encode!(mixed_map, [quote: [:string]])
       assert encoded_mixed_map == mixed_map_yaml
     end
 
@@ -214,7 +214,7 @@ defmodule YamelTest do
       assert encoded_map_in_sequence == map_in_sequence_yaml
     end
 
-    test "when value is Mapping-in-Sequence with 'quoted' option" do
+    test "when value is Mapping-in-Sequence with 'quote' option" do
       map_in_sequence = [%{"work on yamel.ex" => ["work on Store"]}]
 
       map_in_sequence_yaml = ~S"""
@@ -224,7 +224,7 @@ defmodule YamelTest do
 
       """
 
-      encoded_map_in_sequence = Yamel.encode!(map_in_sequence, [:quoted])
+      encoded_map_in_sequence = Yamel.encode!(map_in_sequence, [quote: [:string]])
       assert encoded_map_in_sequence == map_in_sequence_yaml
     end
 
@@ -243,7 +243,7 @@ defmodule YamelTest do
       assert encoded_sequence_in_a_map == sequence_in_map_yaml
     end
 
-    test "when value is Sequence-in-Mapping with 'quoted' option" do
+    test "when value is Sequence-in-Mapping with 'quote' option" do
       sequence_in_map = %{allow: ["localhost", "%.sourceforge.net", "%.freepan.org"]}
 
       sequence_in_map_yaml = ~S"""
@@ -254,7 +254,7 @@ defmodule YamelTest do
 
       """
 
-      encoded_sequence_in_a_map = Yamel.encode!(sequence_in_map, [:quoted])
+      encoded_sequence_in_a_map = Yamel.encode!(sequence_in_map, [quote: [:string]])
       assert encoded_sequence_in_a_map == sequence_in_map_yaml
     end
 
@@ -321,7 +321,61 @@ defmodule YamelTest do
       assert encoded_different_value_types == different_value_types_yaml
     end
 
-    test "when structure has different value types with 'quoted' option" do
+    test "when structure has different value types with 'quote' option only for strings" do
+      value = ["açaí", :banana, :"whey protein", 300, :g, total: 10.23]
+
+      different_value_types_yaml = ~S"""
+      - "açaí"
+      - banana
+      - whey protein
+      - 300
+      - g
+      -
+        total: 10.23
+
+      """
+
+      encoded_different_value_types = Yamel.encode!(value, [quote: [:string]])
+      assert encoded_different_value_types == different_value_types_yaml
+    end
+
+    test "when structure has different value types with 'quote' option only for atoms" do
+      value = ["açaí", :banana, :"whey protein", 300, :g, total: 10.23]
+
+      different_value_types_yaml = ~S"""
+      - açaí
+      - "banana"
+      - "whey protein"
+      - 300
+      - "g"
+      -
+        total: 10.23
+
+      """
+
+      encoded_different_value_types = Yamel.encode!(value, [quote: [:atom]])
+      assert encoded_different_value_types == different_value_types_yaml
+    end
+
+    test "when structure has different value types with 'quote' option only for numbers" do
+      value = ["açaí", :banana, :"whey protein", 300, :g, total: 10.23]
+
+      different_value_types_yaml = ~S"""
+      - açaí
+      - banana
+      - whey protein
+      - "300"
+      - g
+      -
+        total: "10.23"
+
+      """
+
+      encoded_different_value_types = Yamel.encode!(value, [quote: [:number]])
+      assert encoded_different_value_types == different_value_types_yaml
+    end
+
+    test "when structure has different value types with 'quote' option" do
       value = ["açaí", :banana, :"whey protein", 300, :g, total: 10.23]
 
       different_value_types_yaml = ~S"""
@@ -335,7 +389,7 @@ defmodule YamelTest do
 
       """
 
-      encoded_different_value_types = Yamel.encode!(value, [:quoted])
+      encoded_different_value_types = Yamel.encode!(value, [quote: [:string, :number, :atom]])
       assert encoded_different_value_types == different_value_types_yaml
     end
 
