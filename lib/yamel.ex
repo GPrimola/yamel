@@ -149,25 +149,25 @@ defmodule Yamel do
     do: "#{indentation}#{key}: #{serialize(value, opts)}"
 
   defp serialize(bitstring, %{quote: quoted} = _opts) when is_bitstring(bitstring) do
-    if Enum.member?(quoted, :string), 
+    if Enum.member?(quoted, :string),
       do: "\"#{bitstring}\"\n",
       else: "#{bitstring}\n"
   end
 
   defp serialize(number, %{quote: quoted} = _opts) when is_number(number) do
-    if Enum.member?(quoted, :number), 
+    if Enum.member?(quoted, :number),
       do: "\"#{number}\"\n",
       else: "#{number}\n"
   end
 
   defp serialize(boolean, %{quote: quoted} = _opts) when is_boolean(boolean) do
-    if Enum.member?(quoted, :boolean), 
+    if Enum.member?(quoted, :boolean),
       do: "\"#{boolean}\"\n",
       else: "#{boolean}\n"
   end
-  
+
   defp serialize(atom, %{quote: quoted} = _opts) when is_atom(atom) do
-    if Enum.member?(quoted, :atom), 
+    if Enum.member?(quoted, :atom),
       do: "\"#{atom}\"\n",
       else: "#{atom}\n"
   end

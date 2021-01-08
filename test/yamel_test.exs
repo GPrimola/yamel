@@ -91,7 +91,7 @@ defmodule YamelTest do
 
       """
 
-      encoded_simple_map = Yamel.encode!(simple_map, [quote: [:string]])
+      encoded_simple_map = Yamel.encode!(simple_map, quote: [:string])
       assert encoded_simple_map == simple_map_yaml
     end
 
@@ -138,7 +138,7 @@ defmodule YamelTest do
 
       """
 
-      encoded_nested_map = Yamel.encode!(nested_map, [quote: [:string]])
+      encoded_nested_map = Yamel.encode!(nested_map, quote: [:string])
       assert encoded_nested_map == nested_map_yaml
     end
 
@@ -196,7 +196,7 @@ defmodule YamelTest do
 
       """
 
-      encoded_mixed_map = Yamel.encode!(mixed_map, [quote: [:string]])
+      encoded_mixed_map = Yamel.encode!(mixed_map, quote: [:string])
       assert encoded_mixed_map == mixed_map_yaml
     end
 
@@ -224,7 +224,7 @@ defmodule YamelTest do
 
       """
 
-      encoded_map_in_sequence = Yamel.encode!(map_in_sequence, [quote: [:string]])
+      encoded_map_in_sequence = Yamel.encode!(map_in_sequence, quote: [:string])
       assert encoded_map_in_sequence == map_in_sequence_yaml
     end
 
@@ -254,7 +254,7 @@ defmodule YamelTest do
 
       """
 
-      encoded_sequence_in_a_map = Yamel.encode!(sequence_in_map, [quote: [:string]])
+      encoded_sequence_in_a_map = Yamel.encode!(sequence_in_map, quote: [:string])
       assert encoded_sequence_in_a_map == sequence_in_map_yaml
     end
 
@@ -335,7 +335,7 @@ defmodule YamelTest do
 
       """
 
-      encoded_different_value_types = Yamel.encode!(value, [quote: [:string]])
+      encoded_different_value_types = Yamel.encode!(value, quote: [:string])
       assert encoded_different_value_types == different_value_types_yaml
     end
 
@@ -353,7 +353,7 @@ defmodule YamelTest do
 
       """
 
-      encoded_different_value_types = Yamel.encode!(value, [quote: [:atom]])
+      encoded_different_value_types = Yamel.encode!(value, quote: [:atom])
       assert encoded_different_value_types == different_value_types_yaml
     end
 
@@ -371,7 +371,7 @@ defmodule YamelTest do
 
       """
 
-      encoded_different_value_types = Yamel.encode!(value, [quote: [:number]])
+      encoded_different_value_types = Yamel.encode!(value, quote: [:number])
       assert encoded_different_value_types == different_value_types_yaml
     end
 
@@ -389,7 +389,7 @@ defmodule YamelTest do
 
       """
 
-      encoded_different_value_types = Yamel.encode!(value, [quote: [:string, :number, :atom]])
+      encoded_different_value_types = Yamel.encode!(value, quote: [:string, :number, :atom])
       assert encoded_different_value_types == different_value_types_yaml
     end
 
