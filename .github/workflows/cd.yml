@@ -76,9 +76,36 @@ jobs:
         HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
       run: mix hex.publish --dry-run
 
-  publish_package:
+  update_version:
     runs-on: ubuntu-latest
     needs: check_package
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Elixir
+        uses: actions/setup-elixir@v1
+        with:
+          elixir-version: '1.8.x'
+          otp-version: '22.3'
+      - name: Update README.md and mix.exs
+        run: |
+          elixir ./scripts/update_version.exs
+          git config user.name Lucasbot
+          git config user.email lucas.primola@gmail.com
+          if [[ -n $(git diff --stat) ]]
+          then
+            git commit -am "Updated README.md and mix.exs to version $(cat version)."
+            git push origin master
+          else
+            echo "Already updated with version."
+          fi
+
+
+  publish_package:
+    runs-on: ubuntu-latest
+    needs: update_version
 
     steps:
     - uses: actions/checkout@v2
@@ -102,30 +129,3 @@ jobs:
     - env:
         HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
       run: mix hex.publish --yes
-
-
-  update_version:
-    runs-on: ubuntu-latest
-    needs: publish_package
-
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Elixir
-        uses: actions/setup-elixir@v1
-        with:
-          elixir-version: '1.8.x'
-          otp-version: '22.3'
-      - name: Update README.md and mix.exs
-        run: |
-          elixir ./scripts/update_version.exs
-          git config user.name Lucasbot
-          git config user.email lucas.primola@gmail.com
-          if [[ -n $(git diff --stat) ]]
-          then
-            git commit -am "Updated README.md and mix.exs to version $(cat version)."
-            git push origin master
-          else
-            echo "Already updated with version."
-          fi
