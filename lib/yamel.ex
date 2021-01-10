@@ -80,10 +80,22 @@ defmodule Yamel do
   encoded YAML term. Otherwise, returns `{:error, reason}` with `reason`
   being a string stating the error reason.
 
+  ## Options
+    
+    * `:quote` - The value types to be quoted. 
+      Supported value types are: [:atom, :boolean, :number, :string]
+
+
   ## Examples
 
       iex> Yamel.encode(["foo", "bar", "baz"])
       {:ok, "- foo\n- bar\n- baz\n\n"}
+
+      iex> Yamel.encode([:foo, "bar", 123, true], quote: [:string, :atom, :number])
+      {:ok, "- \"foo\"\n- \"bar\"\n- \"123\"\n- true\n\n"}
+
+      iex> Yamel.encode([:foo, "bar", 12.3, true], quote: [:string, :boolean])
+      {:ok, "- foo\n- "bar"\n- 12.3\n- \"true\"\n\n"}
 
   """
   @spec encode(Yamel.t(), opts :: keyword()) :: {:ok, yaml()} | {:error, reason :: binary()}
