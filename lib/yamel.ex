@@ -59,10 +59,22 @@ defmodule Yamel do
   Encodes a YAML term directly into a string, throwing an exception if the term
   can not be encoded.
 
+  ## Options
+    
+    * `:quote` - The value types to be quoted. 
+      Supported value types are: `[:atom, :boolean, :number, :string]`
+
+
   ## Examples
 
       iex> Yamel.encode!(["foo", "bar", "baz"])
       "- foo\n- bar\n- baz\n\n"
+
+      iex> Yamel.encode!([:foo, "bar", 123, true], quote: [:string, :atom, :number])
+      "- \"foo\"\n- \"bar\"\n- \"123\"\n- true\n\n"
+
+      iex> Yamel.encode!([:foo, "bar", 12.3, true], quote: [:string, :boolean])
+      "- foo\n- \"bar\"\n- 12.3\n- \"true\"\n\n"
 
   """
   @spec encode!(Yamel.t()) :: yaml()
@@ -83,7 +95,7 @@ defmodule Yamel do
   ## Options
     
     * `:quote` - The value types to be quoted. 
-      Supported value types are: [:atom, :boolean, :number, :string]
+      Supported value types are: `[:atom, :boolean, :number, :string]`
 
 
   ## Examples
@@ -95,7 +107,7 @@ defmodule Yamel do
       {:ok, "- \"foo\"\n- \"bar\"\n- \"123\"\n- true\n\n"}
 
       iex> Yamel.encode([:foo, "bar", 12.3, true], quote: [:string, :boolean])
-      {:ok, "- foo\n- "bar"\n- 12.3\n- \"true\"\n\n"}
+      {:ok, "- foo\n- \"bar\"\n- 12.3\n- \"true\"\n\n"}
 
   """
   @spec encode(Yamel.t(), opts :: keyword()) :: {:ok, yaml()} | {:error, reason :: binary()}
