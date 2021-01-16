@@ -1,6 +1,6 @@
 # Yamel
 
-![CI](https://github.com/GPrimola/yamel/workflows/Yamel%20CI/badge.svg)
+![CI](https://github.com/GPrimola/yamel/workflows/Yamel%20Master%20CI/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/GPrimola/yamel/badge.svg?branch=master)](https://coveralls.io/github/GPrimola/yamel?branch=master)
 [![Docs](https://img.shields.io/badge/api-docs-blueviolet.svg?style=flat)](https://hexdocs.pm/yamel)
 ![Hex.pm](https://img.shields.io/hexpm/v/yamel)
