@@ -418,7 +418,7 @@ defmodule YamelTest do
 
       expected = %{foo: "bar", zoo: %{fruit: "apple", name: "steve", sport: "baseball"}}
 
-      assert Yamel.decode!(yaml, keys: :atoms) == expected
+      assert Yamel.decode!(yaml, keys: :atom) == expected
     end
   end
 
@@ -435,7 +435,61 @@ defmodule YamelTest do
 
       expected = [%{foo: %{a: 1, b: 2}}, %{bar: %{c: 3, d: 4}}]
 
-      assert Yamel.decode(yaml, keys: :atoms) == {:ok, expected}
+      assert Yamel.decode(yaml, keys: :atom) == {:ok, expected}
+    end
+
+    test "when structure is a list" do
+      yaml = ~S"""
+      - Apple
+      - Orange
+      - Strawberry
+      - Mango
+      """
+
+      expected = ["Apple", "Orange", "Strawberry", "Mango"]
+
+      assert Yamel.decode(yaml) == {:ok, expected}
+    end
+
+    test "when structure is list with option keys: :atom" do
+      yaml = ~S"""
+      - Apple
+      - Orange
+      - Strawberry
+      - Mango
+      """
+
+      expected = ["Apple", "Orange", "Strawberry", "Mango"]
+
+      assert Yamel.decode(yaml, keys: :atom) == {:ok, expected}
+    end
+
+    test "when structure is list with map" do
+      yaml = ~S"""
+      - Apple
+      - Orange
+      - Strawberry
+      - Mango
+      - Fruit: Caju
+      """
+
+      expected = ["Apple", "Orange", "Strawberry", "Mango", %{"Fruit" => "Caju"}]
+
+      assert Yamel.decode(yaml) == {:ok, expected}
+    end
+
+    test "when structure is list with map and option keys: :atom" do
+      yaml = ~S"""
+      - Apple
+      - Orange
+      - Strawberry
+      - Mango
+      - Fruit: Caju
+      """
+
+      expected = ["Apple", "Orange", "Strawberry", "Mango", %{:Fruit => "Caju"}]
+
+      assert Yamel.decode(yaml, keys: :atom) == {:ok, expected}
     end
   end
 end

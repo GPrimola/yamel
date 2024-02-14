@@ -1,27 +1,43 @@
 defmodule Yamel do
   @moduledoc """
-  Module to work with YAML strings in Elixir.
+  Defines functions to work with YAML in Elixir.
   """
 
   @type t :: map() | list()
-  @type yaml :: binary()
-  @type keys :: :atoms | :strings
-  @type decode_opt :: {:keys, keys}
+  @type yaml :: String.t()
+  @type keys :: :atom | :string | :atoms | :strings
+  @type quotable_types :: :atom | :string | :number | :boolean
+  @type decode_opts :: [keys: keys] | []
+  @type encode_opts :: [quote: quotable_types] | []
+  @type parse_error :: YamlElixir.ParsingError.t()
 
   @doc ~S"""
-  Decode a YAML string into it respective data type in elixir, throwing an exception if the
-  string can not be encoded
+  Decodes a YAML string to a map or list, throws if fails.
+
+  Throws `parse_error()` exception if given YAML cannot be parsed.
+
+  ## Options
+    * `:keys` - indicates the type for the map's keys. Default: `:string`
 
   ## Examples
 
-     iex> Yamel.decode!("
-     ...>     name: Jane Doe
-     ...>     job: Developer
-     ...>     skill: Elite
-     ...>     employed: True")
-     %{"employed" => true, "job" => "Developer", "name" => "Jane Doe", "skill" => "Elite"}
+      iex> Yamel.decode!("
+      ...>     name: Jane Doe
+      ...>     job: Developer
+      ...>     skill: Elite
+      ...>     employed: True")
+      %{"employed" => true, "job" => "Developer", "name" => "Jane Doe", "skill" => "Elite"}
+
+    With option `keys: :atom`
+
+      iex> Yamel.decode!("
+      ...>     name: Jane Doe
+      ...>     job: Developer
+      ...>     skill: Elite
+      ...>     employed: True", keys: :atom)
+      %{employed: true, job: "Developer", name: "Jane Doe", skill: "Elite"}
   """
-  @spec decode!(yaml(), [decode_opt]) :: Yamel.t()
+  @spec decode!(yaml(), decode_opts()) :: Yamel.t()
   def decode!(yaml_string, options \\ []) do
     keys = Keyword.get(options, :keys, :strings)
 
@@ -31,9 +47,12 @@ defmodule Yamel do
   end
 
   @doc ~S"""
-  Decode a YAML string into it respective data type in elixir, returning `{:ok, Yamel.t()}`
-  where the second term is the Yamel in Elixir representation. Otherwise, returns `{:error, reason}`
-  where `reason` is a `YamlElixir` error module with a message inside
+  Decodes a YAML string to a map or list.
+
+  Returns `{:ok, Yamel.t()}` or `{:error, reason}`, where reason is `parse_error()`
+
+  ## Options
+    * `:keys` - indicates the type for the map's keys. Default: `:string`
 
   ## Examples
 
@@ -45,14 +64,17 @@ defmodule Yamel do
       ...>    - Mango")
       {:ok, ["Apple", "Orange","Strawberry", "Mango"]}
   """
-
-  @spec decode(yaml(), [decode_opt]) :: {:ok, Yamel.t()} | {:error, reason :: binary()}
+  @spec decode(yaml(), decode_opts()) :: {:ok, Yamel.t()} | {:error, parse_error()}
   def decode(yaml_string, options \\ []) do
-    keys = Keyword.get(options, :keys, :strings)
+    keys = Keyword.get(options, :keys, :string)
 
-    yaml_string
-    |> YamlElixir.read_from_string()
-    |> maybe_atom(keys)
+    case YamlElixir.read_from_string(yaml_string) do
+      {:ok, yaml} ->
+        {:ok, maybe_atom(yaml, keys)}
+
+      error ->
+        error
+    end
   end
 
   @doc ~S"""
@@ -60,9 +82,8 @@ defmodule Yamel do
   can not be encoded.
 
   ## Options
-    
-    * `:quote` - The value types to be quoted. 
-      Supported value types are: `[:atom, :boolean, :number, :string]`
+
+    * `:quote` - The value types to be quoted.
 
 
   ## Examples
@@ -77,7 +98,7 @@ defmodule Yamel do
       "- foo\n- \"bar\"\n- 12.3\n- \"true\"\n\n"
 
   """
-  @spec encode!(Yamel.t()) :: yaml()
+  @spec encode!(Yamel.t(), encode_opts()) :: yaml()
   def encode!(map_or_list, opts \\ [])
 
   def encode!(map_or_list, opts)
@@ -93,9 +114,8 @@ defmodule Yamel do
   being a string stating the error reason.
 
   ## Options
-    
-    * `:quote` - The value types to be quoted. 
-      Supported value types are: `[:atom, :boolean, :number, :string]`
+
+    * `:quote` - The value types to be quoted.
 
 
   ## Examples
@@ -110,7 +130,7 @@ defmodule Yamel do
       {:ok, "- foo\n- \"bar\"\n- 12.3\n- \"true\"\n\n"}
 
   """
-  @spec encode(Yamel.t(), opts :: keyword()) :: {:ok, yaml()} | {:error, reason :: binary()}
+  @spec encode(Yamel.t(), encode_opts()) :: {:ok, yaml()} | {:error, reason :: String.t()}
   def encode(map_or_list, opts \\ [])
 
   def encode(map_or_list, opts) when is_map(map_or_list) or is_list(map_or_list),
@@ -122,7 +142,7 @@ defmodule Yamel do
 
   defp maybe_atom({:error, _reason} = error, _keys), do: error
 
-  defp maybe_atom(map, :atoms) when is_map(map) do
+  defp maybe_atom(map, keys) when is_map(map) and keys in [:atom, :atoms] do
     for {key, value} <- map, into: %{} do
       cond do
         is_atom(key) -> {key, maybe_atom(value, :atoms)}
@@ -131,7 +151,7 @@ defmodule Yamel do
     end
   end
 
-  defp maybe_atom(list, :atoms) when is_list(list) do
+  defp maybe_atom(list, keys) when is_list(list) and keys in [:atom, :atoms] do
     for value <- list, into: [] do
       cond do
         is_map(value) -> maybe_atom(value, :atoms)
