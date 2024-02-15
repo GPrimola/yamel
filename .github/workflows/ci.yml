@@ -1,23 +1,29 @@
 name: Yamel CI
 
 on:
+  push:
+    branches: [ "main" ]
   pull_request:
-    branches:
-      - master
+    branches: [ "main" ]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        otp: ['22.3.4.26']
+        elixir: ['1.8.2']
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Elixir
-      uses: actions/setup-elixir@v1
+      uses: erlef/setup-beam@v1
       with:
-        elixir-version: '1.8.x'
-        otp-version: '22.3'
+        elixir-version: '1.8.2'
+        otp-version: '22.3.4.26'
+        version-type: 'strict'
     - name: Cache Dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           deps
@@ -40,18 +46,19 @@ jobs:
       run: mix compile
 
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: build
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Elixir
-      uses: actions/setup-elixir@v1
+      uses: erlef/setup-beam@v1
       with:
-        elixir-version: '1.8.x'
-        otp-version: '22.3'
+        elixir-version: '1.8.2'
+        otp-version: '22.3.4.26'
+        version-type: 'strict'
     - name: Cache Dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           deps
@@ -65,18 +72,19 @@ jobs:
       run: mix format --check-formatted
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: build
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Elixir
-      uses: actions/setup-elixir@v1
+      uses: erlef/setup-beam@v1
       with:
-        elixir-version: '1.8.x'
-        otp-version: '22.3'
+        elixir-version: '1.8.2'
+        otp-version: '22.3.4.26'
+        version-type: 'strict'
     - name: Cache Dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           deps
@@ -84,27 +92,49 @@ jobs:
         key: ${{ runner.os }}-mix-test-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
         restore-keys: |
           ${{ runner.os }}-mix-test-
-
     - run: mix test
 
+  typecheck:
+    runs-on: ubuntu-20.04
+    needs: build
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Elixir
+      uses: erlef/setup-beam@v1
+      with:
+        elixir-version: '1.8.2'
+        otp-version: '22.3.4.26'
+        version-type: 'strict'
+    - name: Cache Dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          deps
+          _build/test/lib
+        key: ${{ runner.os }}-mix-test-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+        restore-keys: |
+          ${{ runner.os }}-mix-test-
+    - run: mix dialyzer
+
   coverage:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: test
 
     env:
       MIX_ENV: test
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
-
+      - uses: actions/checkout@v3
       - name: Set up Elixir
-        uses: actions/setup-elixir@v1
+        uses: erlef/setup-beam@v1
         with:
-          elixir-version: '1.9.x'
-          otp-version: '22.3'
+          elixir-version: '1.8.2'
+          otp-version: '22.3.4.26'
+          version-type: 'strict'
 
       - name: Cache Dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             deps

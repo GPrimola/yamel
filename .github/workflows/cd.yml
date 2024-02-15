@@ -2,24 +2,25 @@ name: Yamel CD
 
 on:
   workflow_run:
-    workflows: ["Yamel Master CI"]
+    workflows: ["Yamel Main CI"]
     types:
       - completed
 
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Elixir
-      uses: actions/setup-elixir@v1
+      uses: erlef/setup-beam@v1
       with:
-        elixir-version: '1.8.x'
-        otp-version: '22.3'
+        elixir-version: '1.8.2'
+        otp-version: '22.3.4.26'
+        version-type: 'strict'
     - name: Cache Dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           _build/prod/lib
@@ -50,18 +51,19 @@ jobs:
       run: mix docs
 
   check_package:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: build
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Elixir
-      uses: actions/setup-elixir@v1
+      uses: erlef/setup-beam@v1
       with:
-        elixir-version: '1.8.x'
-        otp-version: '22.3'
+        elixir-version: '1.8.2'
+        otp-version: '22.3.4.26'
+        version-type: 'strict'
     - name: Cache Dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           _build/prod/lib
@@ -77,18 +79,19 @@ jobs:
       run: mix hex.publish --dry-run
 
   update_version:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: check_package
 
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Elixir
-        uses: actions/setup-elixir@v1
+        uses: erlef/setup-beam@v1
         with:
-          elixir-version: '1.8.x'
-          otp-version: '22.3'
+          elixir-version: '1.8.2'
+          otp-version: '22.3.4.26'
+          version-type: 'strict'
       - name: Update README.md and mix.exs
         run: |
           elixir ./scripts/update_version.exs
@@ -104,18 +107,19 @@ jobs:
 
 
   publish_package:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: update_version
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Elixir
-      uses: actions/setup-elixir@v1
+      uses: erlef/setup-beam@v1
       with:
-        elixir-version: '1.8.x'
-        otp-version: '22.3'
+        elixir-version: '1.8.2'
+        otp-version: '22.3.4.26'
+        version-type: 'strict'
     - name: Cache Dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           _build/prod/lib
