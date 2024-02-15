@@ -83,6 +83,10 @@ jobs:
   update_version:
     runs-on: ubuntu-20.04
     needs: check_package
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the
+      # added or changed files to the repository.
+      contents: write
 
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -95,17 +99,11 @@ jobs:
           otp-version: '22.3.4.26'
           version-type: 'strict'
       - name: Update README.md and mix.exs
-        run: |
-          elixir ./scripts/update_version.exs
-          git config user.name Lucasbot
-          git config user.email lucas.primola@gmail.com
-          if [[ -n $(git diff --stat) ]]
-          then
-            git commit -am "Updated README.md and mix.exs to version $(cat version)."
-            git push origin master
-          else
-            echo "No version change"
-          fi
+        run: elixir ./scripts/update_version.exs
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Updated README.md and mix.exs to version $(cat version).
+
 
 
   publish_package:
