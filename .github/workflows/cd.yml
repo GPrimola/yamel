@@ -102,7 +102,7 @@ jobs:
             git commit -am "Updated README.md and mix.exs to version $(cat version)."
             git push origin master
           else
-            echo "Already updated with version."
+            echo "No version change"
           fi
 
 

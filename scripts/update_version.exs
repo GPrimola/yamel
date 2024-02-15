@@ -23,15 +23,21 @@ defmodule UpdateVersion do
   @version_file "./version"
   @mix_exs_file "./mix.exs"
   @readme_file "./README.md"
+  @mix_version_regex ~r/@version \"(?<version>.*)\"/
+  @readme_version_regex ~r/{:yamel, \"~> (?<version>.*)\"}/
 
   def update() do
     with {:ok, version} <- get_version(),
       {:ok, mix_exs} <- File.read(@mix_exs_file),
       {:ok, readme} <- File.read(@readme_file),
+      :new_version <- check_version(version, mix_exs, readme),
       {:ok, _mix_exs} <- update_mix(mix_exs, version),
       {:ok, _readme} <- update_readme(readme, version) do
-        IO.puts("\nThe application was updated to version #{version}!")
+        IO.puts("\nmix.exs and README.md successfully updated with version #{version}!")
       else
+        :same_version ->
+          IO.puts("mix.exs and README.md will not be changed")
+
         {:error, reason} ->
           raise reason
       end
@@ -42,9 +48,19 @@ defmodule UpdateVersion do
     {:ok, String.trim(version)}
   end
 
+  defp check_version(version, mix_exs, readme) do
+    with %{"version" => ^version} <- Regex.named_captures(@mix_version_regex, mix_exs),
+      %{"version" => ^version} <- Regex.named_captures(@readme_version_regex, readme) do
+        :same_version
+    else
+      _ ->
+        :new_version
+    end
+  end
+
   def update_mix(mix_exs, version) do
     IO.puts("Updating #{@mix_exs_file}...")
-    mix_exs = String.replace(mix_exs, ~r/@version \".*\"/, "@version \"#{version}\"", global: false)
+    mix_exs = String.replace(mix_exs, @mix_version_regex, "@version \"#{version}\"", global: false)
 
     case File.write!(@mix_exs_file, mix_exs) do
       :ok ->
@@ -56,7 +72,7 @@ defmodule UpdateVersion do
 
   def update_readme(readme, version) do
     IO.puts("Updating #{@readme_file}...")
-    readme = String.replace(readme, ~r/{:yamel, \"~> .*\"}/, "{:yamel, \"~> #{version}\"}")
+    readme = String.replace(readme, @readme_version_regex, "{:yamel, \"~> #{version}\"}")
 
     case File.write!(@readme_file, readme) do
       :ok ->
