@@ -27,6 +27,7 @@ jobs:
           deps
           doc
           mix.exs
+          mix.lock
         key: ${{ runner.os }}-mix-prod-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
         restore-keys: |
           ${{ runner.os }}-mix-prod-
@@ -70,6 +71,7 @@ jobs:
           deps
           doc
           mix.exs
+          mix.lock
         key: ${{ runner.os }}-mix-prod-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
         restore-keys: |
           ${{ runner.os }}-mix-prod-
@@ -126,6 +128,7 @@ jobs:
           deps
           doc
           mix.exs
+          mix.lock
         key: ${{ runner.os }}-mix-prod-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
         restore-keys: |
           ${{ runner.os }}-mix-prod-
