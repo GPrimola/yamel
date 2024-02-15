@@ -16,9 +16,13 @@ defmodule Yamel.IOTest do
     end
 
     test "should raise ? with an invalid YAML file" do
-      assert_raise(YamlElixir.ParsingError, "malformed yaml", fn ->
-        Yamel.IO.read!(@invalid_yml)
-      end)
+      assert_raise(
+        YamlElixir.ParsingError,
+        "Unexpected \"yamerl_collection_start\" token following a \"yamerl_collection_end\" token (line: 3, column: 1)",
+        fn ->
+          Yamel.IO.read!(@invalid_yml)
+        end
+      )
     end
   end
 
@@ -30,7 +34,14 @@ defmodule Yamel.IOTest do
 
     test "should return {:error, reason} with an invalid YAML file" do
       assert {:error, reason} = Yamel.IO.read(@invalid_yml)
-      assert %YamlElixir.ParsingError{message: "malformed yaml"} = reason
+
+      assert %YamlElixir.ParsingError{
+               column: 1,
+               line: 3,
+               message:
+                 "Unexpected \"yamerl_collection_start\" token following a \"yamerl_collection_end\" token",
+               type: :unexpected_token
+             } = reason
     end
   end
 
@@ -51,7 +62,15 @@ defmodule Yamel.IOTest do
 
       yaml_path = "test/fixtures/test.yaml"
       refute File.exists?(yaml_path)
-      assert {:error, %{message: "malformed yaml"}} = Yamel.IO.write(yaml, yaml_path)
+
+      assert {:error,
+              %YamlElixir.ParsingError{
+                column: 13,
+                line: 1,
+                message: "Block mapping value not allowed here",
+                type: :block_mapping_value_not_allowed
+              }} = Yamel.IO.write(yaml, yaml_path)
+
       refute File.exists?(yaml_path)
     end
   end
@@ -74,9 +93,11 @@ defmodule Yamel.IOTest do
       yaml_path = "test/fixtures/test.yaml"
       refute File.exists?(yaml_path)
 
-      assert_raise YamlElixir.ParsingError, "malformed yaml", fn ->
-        Yamel.IO.write!(yaml, yaml_path)
-      end
+      assert_raise YamlElixir.ParsingError,
+                   "Block mapping value not allowed here (line: 1, column: 13)",
+                   fn ->
+                     Yamel.IO.write!(yaml, yaml_path)
+                   end
 
       refute File.exists?(yaml_path)
     end
