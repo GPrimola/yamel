@@ -1,24 +1,3 @@
-
-# {:ok, version} = File.read(version_file)
-# version = String.trim(version)
-# IO.puts("Updating to version #{version}")
-# {:ok, mix_exs} = File.read(mix_exs_file)
-# {:ok, readme} = File.read(readme_file)
-# IO.puts("Updating #{mix_exs_file}...")
-# mix_exs = String.replace(mix_exs, ~r/@version \".*\"/, "@version \"#{version}\"", global: false)
-# mix_exs_file_update = File.write!(mix_exs_file, mix_exs)
-# if mix_exs_file_update == :ok,
-#   do: IO.puts("#{mix_exs_file} updated successfully!"),
-# else: raise "Could not update #{mix_exs_file} to version #{version}. #{inspect(mix_exs_file_update)}"
-#
-# IO.puts("Updating #{readme_file}...")
-# readme = String.replace(readme, ~r/{:yamel, \"~> .*\"}/, "{:yamel, \"~> #{version}\"}")
-# readme_file_update = File.write!(readme_file, readme)
-#
-# if readme_file_update == :ok,
-#   do: IO.puts("#{readme_file} updated successfully!"),
-# else: raise "Could not update #{readme_file} to version #{version}. #{inspect(readme_file_update)}"
-
 defmodule UpdateVersion do
   @version_file "./version"
   @mix_exs_file "./mix.exs"

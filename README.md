@@ -1,4 +1,4 @@
-# Yamel
+# Yamel - Yaml Serializer and Parser
 
 ![CI](https://github.com/GPrimola/yamel/workflows/Main%20CI/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/GPrimola/yamel/badge.svg?branch=master)](https://coveralls.io/github/GPrimola/yamel?branch=master)
