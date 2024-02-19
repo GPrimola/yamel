@@ -5,7 +5,7 @@ defmodule Yamel.MixProject do
   @source_url "https://github.com/GPrimola/yamel"
   @logo_path "priv/img/yamel-logo.png"
   @licenses ["Apache-2.0"]
-  @description: "YAML parser and serializer lib for Elixir."
+  @description "YAML parser and serializer lib for Elixir."
 
   def project do
     [
