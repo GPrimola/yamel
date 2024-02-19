@@ -34,8 +34,11 @@ zoo:
   - vee
 """
 
-Yamel.decode!(yaml_string)
+Yamel.decode!(yaml_string) # equivalent to Yamel.decode!(yaml_string, keys: :string)
 => %{"foo" => "bar", "zoo" => ["caa", "boo", "vee"]}
+
+Yamel.decode!(yaml_string, keys: :atom)
+=> %{foo: "bar", zoo: ["caa", "boo", "vee"]}
 
 Yamel.encode!(["caa", :boo, :"\"foo\""])
 => "- caa\n- boo\n- \"foo\"\n\n"

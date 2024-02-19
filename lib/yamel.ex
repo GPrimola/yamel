@@ -6,9 +6,7 @@ defmodule Yamel do
   @type t :: map() | list()
   @type yaml :: String.t()
   @type keys :: :atom | :string | :atoms | :strings
-  @type quotable_types :: :atom | :string | :number | :boolean
   @type decode_opts :: [keys: keys] | []
-  @type encode_opts :: [quote: quotable_types] | []
   @type parse_error :: YamlElixir.ParsingError.t()
 
   @doc ~S"""
@@ -98,12 +96,13 @@ defmodule Yamel do
       "- foo\n- \"bar\"\n- 12.3\n- \"true\"\n\n"
 
   """
-  @spec encode!(Yamel.t(), encode_opts()) :: yaml()
-  def encode!(map_or_list, opts \\ [])
+  @spec encode!(Yamel.t(), Yamel.Encoder.opts()) :: yaml()
+  def encode!(map_or_list_or_tuple, opts \\ [])
 
-  def encode!(map_or_list, opts)
-      when is_map(map_or_list) or is_list(map_or_list),
-      do: to_yaml!(map_or_list, opts)
+  def encode!(map_or_list_or_tuple, opts)
+      when is_map(map_or_list_or_tuple) or is_list(map_or_list_or_tuple) or
+             is_tuple(map_or_list_or_tuple),
+      do: to_yaml!(map_or_list_or_tuple, opts)
 
   def encode!(value, _opts),
     do: raise(ArgumentError, "Unsupported value: #{inspect(value)}")
@@ -130,7 +129,7 @@ defmodule Yamel do
       {:ok, "- foo\n- \"bar\"\n- 12.3\n- \"true\"\n\n"}
 
   """
-  @spec encode(Yamel.t(), encode_opts()) :: {:ok, yaml()} | {:error, reason :: String.t()}
+  @spec encode(Yamel.t(), Yamel.Encoder.opts()) :: {:ok, yaml()} | {:error, reason :: String.t()}
   def encode(map_or_list, opts \\ [])
 
   def encode(map_or_list, opts) when is_map(map_or_list) or is_list(map_or_list),
@@ -166,68 +165,19 @@ defmodule Yamel do
   defp to_yaml!(map_or_list, opts)
 
   defp to_yaml!(map_or_list, opts) do
-    opts_map =
+    options =
       opts
       |> Enum.map(fn
         opt when is_tuple(opt) -> opt
         opt -> {opt, true}
       end)
       |> Map.new()
-      |> Map.update(:indentation, "", & &1)
       |> Map.update(:quote, [], & &1)
+      |> Map.update(:indent_size, 2, & &1)
+      |> Map.update(:node_level, 0, & &1)
 
     map_or_list
-    |> serialize(opts_map)
-    |> Enum.join()
+    |> Yamel.Encoder.encode(options)
     |> Kernel.<>("\n")
-  end
-
-  defp serialize({key, value}, %{indentation: indentation} = opts)
-       when is_map(value) or is_list(value),
-       do:
-         "#{indentation}#{key}:\n#{
-           serialize(value, Map.put(opts, :indentation, "#{indentation}  "))
-         }"
-
-  defp serialize({key, value}, %{indentation: indentation} = opts),
-    do: "#{indentation}#{key}: #{serialize(value, opts)}"
-
-  defp serialize(bitstring, %{quote: quoted} = _opts) when is_bitstring(bitstring) do
-    if Enum.member?(quoted, :string),
-      do: "\"#{bitstring}\"\n",
-      else: "#{bitstring}\n"
-  end
-
-  defp serialize(number, %{quote: quoted} = _opts) when is_number(number) do
-    if Enum.member?(quoted, :number),
-      do: "\"#{number}\"\n",
-      else: "#{number}\n"
-  end
-
-  defp serialize(boolean, %{quote: quoted} = _opts) when is_boolean(boolean) do
-    if Enum.member?(quoted, :boolean),
-      do: "\"#{boolean}\"\n",
-      else: "#{boolean}\n"
-  end
-
-  defp serialize(atom, %{quote: quoted} = _opts) when is_atom(atom) do
-    if Enum.member?(quoted, :atom),
-      do: "\"#{atom}\"\n",
-      else: "#{atom}\n"
-  end
-
-  defp serialize(map, opts)
-       when is_map(map),
-       do: Enum.map(map, &serialize(&1, opts))
-
-  defp serialize(list_or_tuple, %{indentation: indentation} = opts)
-       when is_list(list_or_tuple) do
-    Enum.map(list_or_tuple, fn
-      value when is_list(value) or is_map(value) or is_tuple(value) ->
-        "#{indentation}-\n#{serialize(value, Map.put(opts, :indentation, "#{indentation}  "))}"
-
-      value ->
-        "#{indentation}- #{serialize(value, opts)}"
-    end)
   end
 end

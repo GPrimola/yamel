@@ -1,6 +1,5 @@
 defmodule YamelTest do
   use ExUnit.Case
-
   doctest Yamel
 
   @doc """
