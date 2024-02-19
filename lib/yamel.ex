@@ -3,7 +3,7 @@ defmodule Yamel do
   Defines functions to work with YAML in Elixir.
   """
 
-  @type t :: map() | list()
+  @type t :: map() | list(any())
   @type yaml :: String.t()
   @type keys :: :atom | :string | :atoms | :strings
   @type decode_opts :: [keys: keys] | []
@@ -97,7 +97,7 @@ defmodule Yamel do
 
   """
   @spec encode!(Yamel.t(), Yamel.Encoder.opts()) :: yaml()
-  def encode!(map_or_list_or_tuple, opts \\ [])
+  def encode!(map_or_list_or_tuple, opts \\ %{node_level: 0, indent_size: 2})
 
   def encode!(map_or_list_or_tuple, opts)
       when is_map(map_or_list_or_tuple) or is_list(map_or_list_or_tuple) or
@@ -130,7 +130,7 @@ defmodule Yamel do
 
   """
   @spec encode(Yamel.t(), Yamel.Encoder.opts()) :: {:ok, yaml()} | {:error, reason :: String.t()}
-  def encode(map_or_list, opts \\ [])
+  def encode(map_or_list, opts \\ %{node_level: 0, indent_size: 2})
 
   def encode(map_or_list, opts) when is_map(map_or_list) or is_list(map_or_list),
     do: {:ok, to_yaml!(map_or_list, opts)}
@@ -161,7 +161,7 @@ defmodule Yamel do
 
   defp maybe_atom(yaml, _keys), do: yaml
 
-  @spec to_yaml!(Yamel.t(), opts :: keyword()) :: yaml()
+  @spec to_yaml!(Yamel.t(), opts :: Yamel.Encoder.opts()) :: yaml()
   defp to_yaml!(map_or_list, opts)
 
   defp to_yaml!(map_or_list, opts) do
