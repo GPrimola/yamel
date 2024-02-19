@@ -2,7 +2,12 @@ defmodule Yamel.EncoderTest do
   use ExUnit.Case
 
   alias Yamel.Encoder
-  alias Yamel.EncoderTest.{EncodeStructTest, EncodeDerivedExceptStructTest, EncodeDerivedStructTest}
+
+  alias Yamel.EncoderTest.{
+    EncodeStructTest,
+    EncodeDerivedExceptStructTest,
+    EncodeDerivedStructTest
+  }
 
   describe "encode/1" do
     test "default opts" do
