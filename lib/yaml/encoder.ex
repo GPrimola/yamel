@@ -13,6 +13,17 @@ defmodule Yamel.EncodeError do
 end
 
 defmodule Yamel.Encoder.Helper do
+  @type scalar ::
+          atom()
+          | binary()
+          | bitstring()
+          | boolean()
+          | number()
+          | Date.t()
+          | DateTime.t()
+          | NaiveDateTime.t()
+          | Time.t()
+
   defguard is_scalar(value)
            when is_atom(value) or
                   is_binary(value) or
@@ -27,7 +38,7 @@ defmodule Yamel.Encoder.Helper do
     do: String.pad_trailing("", level * indent_size, " ")
 
   # when 'value' is a complex type
-  @spec serialize({key :: any(), value :: any()}, Yamel.Encoder.opts()) :: String.t()
+  @spec serialize({key :: scalar(), value :: any()}, Yamel.Encoder.opts()) :: String.t()
   def serialize({key, value}, opts) when is_map(value) or is_list(value) do
     indent = calculate_indentation(opts)
     opts = Map.update(opts, :node_level, 0, &(&1 + 1))
