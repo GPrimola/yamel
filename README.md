@@ -50,3 +50,12 @@ Yamel.encode!(["caa", :boo, :"\"foo\""])
 
 %{foo: value} = Yamel.IO.read!("/from/file.yaml")
 ```
+
+### Deriving
+
+```elixir
+defmodule MyApp.MyStruct do
+  defstruct [:field1, :field2, :field3, field4: true]
+  @derive {Yamel.Encoder, only: [:field2, :field4]}
+end
+```
