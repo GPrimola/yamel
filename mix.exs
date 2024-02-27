@@ -5,13 +5,14 @@ defmodule Yamel.MixProject do
   @source_url "https://github.com/GPrimola/yamel"
   @logo_path "priv/img/yamel-logo.png"
   @licenses ["Apache-2.0"]
-  @description: "YAML parser and serializer lib for Elixir."
+  @description "YAML parser and serializer lib for Elixir."
 
   def project do
     [
       app: :yamel,
       version: @version,
       elixir: "~> 1.8",
+      elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       package: package(),
       deps: deps(),
@@ -30,6 +31,9 @@ defmodule Yamel.MixProject do
       ]
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   # Run "mix help compile.app" to learn about applications.
   def application do
