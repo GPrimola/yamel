@@ -112,6 +112,15 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Updated README.md and mix.exs to version $(cat version).
+      - name: Tag Release
+        run: |
+          git config user.name Lucasbot
+          git config user.email lucas.primola@gmail.com
+          if git tag releases/$(cat version); then
+            git push origin releases/$(cat version) -f
+          else
+            echo "Version already exists."
+          fi
       - name: Publish to Hex.pm
         env:
           HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
