@@ -17,7 +17,7 @@ Add `yamel` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:yamel, "~> 2.0.2"}
+    {:yamel, "~> 2.0.3"}
   ]
 end
 ```
