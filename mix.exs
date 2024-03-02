@@ -45,7 +45,7 @@ defmodule Yamel.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:yaml_elixir, "~> 2.8.0"},
+      {:yaml_elixir, "~> 2.9"},
       {:ex_doc, ">= 0.0.0", runtime: false, only: :dev},
       {:excoveralls, "~> 0.13.2", only: :test},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false}
