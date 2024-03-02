@@ -96,6 +96,17 @@ jobs:
           elixir-version: '1.8.2'
           otp-version: '22.3.4.26'
           version-type: 'strict'
+      - name: Cache Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            _build/prod/lib
+            deps
+            doc
+            mix.lock
+          key: ${{ runner.os }}-mix-prod-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+          restore-keys: |
+            ${{ runner.os }}-mix-prod-
       - name: Update README.md and mix.exs
         run: elixir ./scripts/update_version.exs
       - uses: stefanzweifel/git-auto-commit-action@v5
