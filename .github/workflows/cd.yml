@@ -78,7 +78,7 @@ jobs:
         HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
       run: mix hex.publish --dry-run
 
-  update_version:
+  update_and_publish:
     runs-on: ubuntu-20.04
     needs: check_package
     permissions:
@@ -101,33 +101,7 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Updated README.md and mix.exs to version $(cat version).
-
-
-
-  publish_package:
-    runs-on: ubuntu-20.04
-    needs: update_version
-
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up Elixir
-      uses: erlef/setup-beam@v1
-      with:
-        elixir-version: '1.8.2'
-        otp-version: '22.3.4.26'
-        version-type: 'strict'
-    - name: Cache Dependencies
-      uses: actions/cache@v4
-      with:
-        path: |
-          _build/prod/lib
-          deps
-          doc
-          mix.lock
-        key: ${{ runner.os }}-mix-prod-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
-        restore-keys: |
-          ${{ runner.os }}-mix-prod-
-
-    - env:
-        HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
-      run: mix hex.publish --yes
+      - name: Publish to Hex.pm
+        env:
+          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
+        run: mix hex.publish --yes
